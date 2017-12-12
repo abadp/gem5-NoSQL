@@ -1,0 +1,4 @@
+TARGET_ISA = 'x86'
+CPU_MODELS = 'TimingSimpleCPU,O3CPU,AtomicSimpleCPU'
+PROTOCOL = 'MESI_CMP_directory'
+USE_TOPAZ= True

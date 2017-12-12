@@ -1,0 +1,4 @@
+SS_COMPATIBLE_FP = 1
+CPU_MODELS = 'AtomicSimpleCPU,TimingSimpleCPU,O3CPU,InOrderCPU'
+PROTOCOL = 'Network_test'
+USE_TOPAZ = True

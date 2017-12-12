@@ -1,0 +1,69 @@
+# Copyright (c) 2005-2006 The Regents of The University of Michigan
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met: redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer;
+# redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution;
+# neither the name of the copyright holders nor the names of its
+# contributors may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Authors: Nathan Binkert
+#          Ali Saidi
+#          Valentin Puente
+#	   Jose Angel Herrero
+
+CC=gcc
+AS=as
+LD=ld
+
+OBJS=m5.o m5op_x86.o 
+JNI_OBJS= m5_mapMem_c.o m5op_x86.o jni_gem5Op.o
+
+#JDK_PATH=/path/to/jdk/version_number
+
+JDK_PATH=/tmp/java
+JC=$(JDK_PATH)/bin/javac
+JH=$(JDK_PATH)/bin/javah
+JR=$(JDK_PATH)/bin/jar
+
+CFLAGS=-fPIC -O2 -DM5OP_ADDR=0xFFFF0000 -I $(JDK_PATH)/include/ -I $(JDK_PATH)/include/linux 
+#CFLAGS=-O2 -fPIC -I $(JDK_PATH)/include/ -I $(JDK_PATH)/include/linux 
+
+all: m5 gem5OpJni
+
+%.o: %.S
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+%.o: %.c
+	$(CC)  $(CFLAGS) -o $@ -c $<
+
+m5: $(OBJS)
+	$(CC) -o $@ $(OBJS)
+	
+gem5OpJni: gem5OpJni.jar $(JNI_OBJS)
+	$(CC) --shared -o lib$@.so $(JNI_OBJS)
+
+gem5OpJni.jar:
+	$(JC) jni/gem5Op.java; \
+	$(JH) jni.gem5Op; \
+	$(JR) cvf $@ jni/*.class
+
+clean:
+	rm -f *.o m5 *.jar jni/*.class libgem5OpJni.so jni_gem5Op.h

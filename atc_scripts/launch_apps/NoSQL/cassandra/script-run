@@ -1,0 +1,2 @@
+cd /tmp
+./launch_app-run.sh 3 a 10000 1 10
